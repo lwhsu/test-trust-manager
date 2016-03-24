@@ -8,7 +8,6 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.UUID;
 
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -75,7 +74,7 @@ public class TestTrustManager {
 
             KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
             ts.load(null, null);
-            ts.setCertificateEntry(UUID.randomUUID().toString(), x509certificate);
+            ts.setCertificateEntry(x509certificate.getSubjectDN().getName(), x509certificate);
             c.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ts));
 
             String server = "FreeBSD-jenkins.mbp.lwhsu.org";
