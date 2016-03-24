@@ -124,7 +124,7 @@ public class TestTrustManager {
             System.out.println("Connected to " + server + ".");
 
             c.login(username, password);
-            System.out.println("Remote system is " + c.getSystemName());
+            System.out.println("Remote system is " + c.getSystemType());
 
             c.enterLocalPassiveMode();
 
