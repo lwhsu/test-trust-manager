@@ -73,7 +73,7 @@ public class TestTrustManager {
             c.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
 
             KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
-            ts.load(null, null);
+            ts.load(null);
             ts.setCertificateEntry(x509certificate.getSubjectDN().getName(), x509certificate);
             c.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ts));
 
