@@ -4,15 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.security.KeyStore;
-import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Set;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
+import java.util.UUID;
 
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -74,51 +70,17 @@ public class TestTrustManager {
             // We're done.
             System.out.println("---");
 
-            TrustManagerFactory tmf = TrustManagerFactory
-                    .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            // Using null here initializes the TMF with the default trust store.
-            tmf.init((KeyStore) null);
-
-            // Get hold of the default trust manager
-            X509TrustManager x509Tm = null;
-            for (TrustManager tm : tmf.getTrustManagers()) {
-                if (tm instanceof X509TrustManager) {
-                    x509Tm = (X509TrustManager) tm;
-                    break;
-                }
-            }
-
-            // Wrap it in your own class.
-            final X509TrustManager finalTm = x509Tm;
-            X509TrustManager customTm = new X509TrustManager() {
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return finalTm.getAcceptedIssuers();
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain,
-                        String authType) throws CertificateException {
-                    finalTm.checkServerTrusted(chain, authType);
-                }
-
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain,
-                        String authType) throws CertificateException {
-                    finalTm.checkClientTrusted(chain, authType);
-                }
-            };
-
             FTPSClient c = new FTPSClient(false);
             c.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
-//            c.setTrustManager(customTm);
-            c.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
+
+            KeyStore ts = KeyStore.getInstance(KeyStore.getDefaultType());
+            ts.load(null, null);
+            ts.setCertificateEntry(UUID.randomUUID().toString(), x509certificate);
+            c.setTrustManager(TrustManagerUtils.getDefaultTrustManager(ts));
 
             String server = "FreeBSD-jenkins.mbp.lwhsu.org";
             String username = "lwhsu";
             String password = "abcde";
-            String remote = "";
-            String local = "";
 
             c.connect(server);
             System.out.println("Connected to " + server + ".");
